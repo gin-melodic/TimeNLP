@@ -70,7 +70,7 @@ func (t *TimeUnit) normalization() {
 	t.normSetSpanRelated()
 	t.normSetHoliday()
 	t.normSetTotal()
-	t.modifyTimeBase()
+	//t.modifyTimeBase()
 	for idx, v := range t.tp {
 		t.tpOrigin[idx] = v
 	}
@@ -865,7 +865,8 @@ type SolarTermData struct {
 // china24St 二十世纪和二十一世纪，24节气计算
 // :param year: 年份
 // :param china_st: 节气
-//  :return: 节气日期（月, 日）
+//
+//	:return: 节气日期（月, 日）
 func (t *TimeUnit) china24St(year int, chinaSt string) []int {
 	var stKey []float64
 	if year/100 == 19 || year == 2000 {

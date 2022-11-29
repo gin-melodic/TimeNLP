@@ -601,3 +601,54 @@ func TestLooseDate(t *testing.T) {
 		}
 	}
 }
+
+// TestBug Test a strange bug
+func TestBug(t *testing.T) {
+	normalizer := NewTimeNormalizer(true)
+	target := "10秒钟后提醒我吃饭"
+	t.Log(target)
+	expectType := DELTA
+	expectPoints := []time.Time{
+		time.Date(timeBase.Year(), timeBase.Month(), timeBase.Day(), timeBase.Hour(), timeBase.Minute(), timeBase.Second()+10, 0, loc),
+	}
+	ret, err := normalizer.Parse(target, timeBase)
+	if ret != nil {
+		t.Log(ret.NormalizedString)
+	}
+	if err != nil {
+		t.Error(err)
+	} else if ret.Type != expectType {
+		t.Errorf("expect: %s, got: %s", expectType, ret.Type)
+	} else if len(ret.Points) != len(expectPoints) {
+		t.Errorf("expect: %d points, result: %d points", len(expectPoints), len(ret.Points))
+	} else {
+		for idx, v := range ret.Points {
+			if !v.Time.Equal(expectPoints[idx]) {
+				t.Errorf("expect: %v, got: %v", expectPoints[idx], v)
+			}
+		}
+	}
+
+	// Need to reinitialize because the context will affect each other...
+	normalizer = NewTimeNormalizer(true)
+	target2 := "今天下午6点提醒我做什么"
+	t.Log(target2)
+	expectPoints2 := []time.Time{
+		time.Date(timeBase.Year(), timeBase.Month(), timeBase.Day(), 18, 0, 0, 0, loc),
+	}
+	ret2, err := normalizer.Parse(target2, timeBase)
+	if ret2 != nil {
+		t.Log(ret2.NormalizedString)
+	}
+	if err != nil {
+		t.Error(err)
+	} else if len(ret2.Points) != len(expectPoints2) {
+		t.Errorf("expect: %d points, result: %d points", len(expectPoints2), len(ret2.Points))
+	} else {
+		for idx, v := range ret2.Points {
+			if !v.Time.Equal(expectPoints2[idx]) {
+				t.Errorf("expect: %v, got: %v", expectPoints2[idx], v)
+			}
+		}
+	}
+}
